@@ -43,17 +43,19 @@ backend/
 │   ├── prisma/schema.prisma   # Database schema
 │   ├── prisma/migrations/     # Prisma migrations
 │   └── generated/prisma/      # Generated Prisma client
+└── uploads/                   # Temporary uploaded files
 ```
 
 ## How It Works
 
 ### 1. Server startup
 
-The server starts from `src/app.ts`.
+The server starts from `src/server.ts`.
 
 At startup it:
 
 - Loads environment variables.
+- Imports the Express app from `src/app.ts`.
 - Enables JSON body parsing.
 - Enables CORS for the frontend URL defined in the environment.
 - Mounts the main router.
