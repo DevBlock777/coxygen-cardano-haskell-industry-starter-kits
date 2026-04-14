@@ -34,10 +34,12 @@ backend/
 ├── package.json               # Scripts and dependencies
 ├── tsconfig.json              # TypeScript configuration
 ├── src/
-│   ├── app.ts                 # Express server entry point
+│   ├── app.ts                 # Express application setup
+│   ├── server.ts              # Server startup entry point
 │   ├── router/index.ts        # API routes
 │   ├── config/db.ts           # Prisma + MariaDB connection
 │   ├── config/functions.ts    # Transaction helper
+│   ├── tests/                 # Backend tests
 │   ├── prisma/schema.prisma   # Database schema
 │   ├── prisma/migrations/     # Prisma migrations
 │   └── generated/prisma/      # Generated Prisma client
@@ -48,12 +50,12 @@ backend/
 
 ### 1. Server startup
 
-The server starts from `src/app.ts`.
+The server starts from `src/server.ts`.
 
 At startup it:
 
 - Loads environment variables.
-- Creates an Express app.
+- Imports the Express app from `src/app.ts`.
 - Enables JSON body parsing.
 - Enables CORS for the frontend URL defined in the environment.
 - Mounts the main router.
@@ -198,6 +200,27 @@ Compile the TypeScript project:
 ```bash
 npm run build
 ```
+
+## Tests
+
+The backend includes automated tests for the API.
+
+Current coverage includes:
+
+- `POST /upload` error handling when no file is provided
+
+Run the test suite from the `backend/` directory:
+
+```bash
+npm run test
+```
+
+The tests are written with:
+
+- Mocha
+- Chai
+- Supertest
+- TypeScript via `tsx`
 
 ## Database and Prisma
 

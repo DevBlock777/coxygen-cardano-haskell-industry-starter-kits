@@ -5,7 +5,7 @@
   "main": "index.js",
   "types": "types.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --import=tsx ./node_modules/mocha/bin/mocha 'src/tests/*.test.ts'",
     "dev": "node --import=tsx --watch src/app.ts",
     "build": "tsc"
   },
@@ -29,8 +29,16 @@
     "tsx": "^4.21.0"
   },
   "devDependencies": {
-    "@types/node": "^25.5.0",
-    "prisma": "^7.6.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.6.0",
+    "@types/supertest": "^7.2.0",
+    "chai": "^6.2.2",
+    "jest": "^30.3.0",
+    "mocha": "^7.2.0",
+    "prisma": "^6.19.3",
+    "supertest": "^7.2.2",
+    "ts-node": "^10.9.2",
     "typescript": "^6.0.2"
   }
 }
