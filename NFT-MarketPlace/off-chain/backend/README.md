@@ -43,7 +43,6 @@ backend/
 │   ├── prisma/schema.prisma   # Database schema
 │   ├── prisma/migrations/     # Prisma migrations
 │   └── generated/prisma/      # Generated Prisma client
-└── uploads/                   # Temporary uploaded files
 ```
 
 ## How It Works
