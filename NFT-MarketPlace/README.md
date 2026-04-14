@@ -1,13 +1,13 @@
 # NFT Marketplace
 
-Ce projet est une marketplace NFT sur Cardano. Il est organisé autour d'une séparation claire entre :
+This project is a Cardano NFT marketplace. Its structure is based on a clear separation between:
 
-- `on-chain` : tout ce qui concerne la logique exécutée ou déployée sur la blockchain
-- `off-chain` : tout ce qui fonctionne en dehors de la blockchain pour piloter l'application
+- `on-chain`: everything that is intended to be used on the blockchain
+- `off-chain`: everything that is used outside the blockchain
 
-L'objectif de cette structure est de bien distinguer la partie smart contracts/validator de la partie application métier, interface utilisateur et services backend.
+This organization makes it easier to distinguish the blockchain logic from the application, interface, and backend service layers.
 
-## Structure générale du projet
+## Overall Project Structure
 
 ```text
 NFT-MarketPlace/
@@ -26,76 +26,76 @@ NFT-MarketPlace/
 └── README.md
 ```
 
-## Signification des dossiers
+## Folder Meaning
 
 ### `on-chain`
 
-Le dossier `on-chain` contient les éléments qui servent à définir la logique blockchain du projet.
+The `on-chain` folder contains everything related to the blockchain logic of the project.
 
-On y retrouve notamment :
+It mainly includes:
 
-- les scripts et smart contracts écrits en Haskell/Plutus
-- la logique de validation utilisée par la marketplace NFT
-- l'environnement de compilation et d'exécution Nix
-- les fichiers de test et de documentation liés à la partie blockchain
+- smart contracts and validator logic written in Haskell/Plutus
+- marketplace rules executed through blockchain scripts
+- the Nix-based development and build environment
+- tests and documentation related to the blockchain part
 
-Autrement dit, `on-chain` correspond à ce qui va être utilisé sur la blockchain Cardano.
+In other words, `on-chain` corresponds to what is meant to run on or define behavior for the Cardano blockchain.
 
-#### Sous-structure importante de `on-chain`
+#### Important `on-chain` subfolders
 
 - `on-chain/code/`
-  Contient le code source principal de la partie blockchain.
+  Contains the main source code for the blockchain part of the project.
 
 - `on-chain/code/wspace/`
-  Espace de travail principal du projet Haskell.
+  Main Haskell workspace for the project.
 
 - `on-chain/code/wspace/lecture/`
-  Contient les fichiers de la logique métier on-chain, notamment `NFTMarketPlace.hs` et `Main.hs`.
+  Contains the core on-chain business logic files, especially `NFTMarketPlace.hs` and `Main.hs`.
 
 - `on-chain/code/wspace/tests/`
-  Contient les tests de la partie on-chain.
+  Contains tests for the on-chain code.
 
 - `on-chain/code/Utilities/`
-  Bibliothèque utilitaire utilisée par le projet Haskell.
+  Utility library used by the Haskell project.
 
 - `on-chain/code/nix/`
-  Contient les fichiers liés à la gestion de l'environnement Nix.
+  Contains files related to the Nix environment setup.
 
 - `on-chain/flake.nix`, `on-chain/default.nix`, `on-chain/code/cabal.project`
-  Fichiers de configuration pour construire et exécuter le projet on-chain.
+  Configuration files used to build and run the on-chain project.
 
 ### `off-chain`
 
-Le dossier `off-chain` regroupe tout ce qui est utilisé hors de la blockchain.
+The `off-chain` folder contains everything used outside the blockchain.
 
-Il correspond à la partie applicative qui permet d'interagir avec les smart contracts, avec l'utilisateur et avec les services externes.
+This is the application layer that interacts with the smart contracts, the user, and external services.
 
-Autrement dit, `off-chain` contient tout ce qui n'est pas exécuté sur la blockchain elle-même.
+In other words, `off-chain` contains everything that does not execute on the blockchain itself.
 
-#### Sous-structure importante de `off-chain`
+#### Important `off-chain` subfolders
 
 - `off-chain/frontend/`
-  Interface utilisateur de l'application. C'est la partie qui permet à l'utilisateur de connecter son wallet, consulter les NFTs et lancer des actions comme le mint, la vente, l'achat, la mise à jour ou l'annulation.
+  User interface of the application. This part allows users to connect their wallet, view NFTs, and trigger actions such as minting, listing, buying, updating, or canceling.
 
 - `off-chain/backend/`
-  Serveur backend de l'application. Il prend en charge les services complémentaires hors blockchain comme la gestion d'API, l'upload de fichiers, la persistance de certaines données et la communication avec des services externes.
+  Backend server of the application. It handles complementary off-chain services such as API management, file uploads, data persistence, and communication with external services.
 
-## Lecture fonctionnelle du projet
+## Functional Reading Of The Project
 
-Le projet peut donc se comprendre comme suit :
+The project can be understood in the following way:
 
-1. La partie `on-chain` définit les règles blockchain de la marketplace NFT.
-2. La partie `off-chain/frontend` fournit l'interface et prépare les interactions utilisateur.
-3. La partie `off-chain/backend` fournit les services techniques nécessaires en dehors de la blockchain.
+1. `on-chain` defines the blockchain rules of the NFT marketplace.
+2. `off-chain/frontend` provides the interface and prepares user interactions.
+3. `off-chain/backend` provides the technical services required outside the blockchain.
 
-Cette séparation permet de mieux comprendre les responsabilités :
+This separation makes the responsibilities clear:
 
-- `on-chain` = logique blockchain, validation, scripts
-- `off-chain` = interface, orchestration, API, stockage, intégrations
+- `on-chain` = blockchain logic, validation, scripts
+- `off-chain` = interface, orchestration, APIs, storage, integrations
 
-## Fichiers clés pour démarrer
+## Key Files To Start With
 
-Si vous souhaitez comprendre rapidement le projet, les fichiers les plus utiles sont :
+If you want to understand the project quickly, the most useful files to start with are:
 
 - `on-chain/code/wspace/lecture/NFTMarketPlace.hs`
 - `on-chain/code/wspace/lecture/Main.hs`
@@ -103,11 +103,11 @@ Si vous souhaitez comprendre rapidement le projet, les fichiers les plus utiles 
 - `off-chain/frontend/README.md`
 - `off-chain/backend/README.md`
 
-## Résumé
+## Summary
 
-La structuration du projet repose sur une idée simple :
+The project structure follows one simple idea:
 
-- `on-chain` contient ce qui vit côté blockchain
-- `off-chain` contient ce qui vit en dehors de la blockchain
+- `on-chain` contains what lives on the blockchain side
+- `off-chain` contains what lives outside the blockchain
 
-Cette organisation rend le projet plus lisible, plus maintenable et plus simple à faire évoluer.
+This makes the project easier to read, maintain, and extend.
