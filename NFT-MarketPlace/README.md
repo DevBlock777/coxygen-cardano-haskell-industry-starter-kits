@@ -1,275 +1,113 @@
-# Cardano NFT Marketplace
+# NFT Marketplace
 
-This project is a Cardano NFT marketplace built around a React frontend, an Express backend, and smart-contract interactions on the Cardano `Preprod` network.
+Ce projet est une marketplace NFT sur Cardano. Il est organisé autour d'une séparation claire entre :
 
-It allows users to:
+- `on-chain` : tout ce qui concerne la logique exécutée ou déployée sur la blockchain
+- `off-chain` : tout ce qui fonctionne en dehors de la blockchain pour piloter l'application
 
-- connect a supported Cardano wallet
-- mint NFTs with metadata and media files
-- upload NFT media to Lighthouse/IPFS
-- list NFTs for sale through a marketplace validator
-- browse active listings
-- buy listed NFTs
-- update listing prices
-- cancel listings
-- store selected transaction records in a backend database
+L'objectif de cette structure est de bien distinguer la partie smart contracts/validator de la partie application métier, interface utilisateur et services backend.
 
-## Project Overview
-
-The application is split into two main parts:
-
-- `frontend/`: the user interface and Cardano interaction layer
-- `backend/`: the API for file uploads and transaction persistence
-
-The frontend handles most blockchain actions directly with Lucid, while the backend supports upload and database concerns.
-
-## Main Features
-
-- Cardano wallet connection
-- NFT minting on Cardano Preprod
-- Lighthouse/IPFS media upload
-- Marketplace listing display
-- Sell, buy, update, and cancel marketplace actions
-- Transaction logging for mint activity
-- MariaDB persistence through Prisma
-
-## Architecture
+## Structure générale du projet
 
 ```text
-User
-  -> Frontend (React + Vite)
-     -> Cardano wallet extension
-     -> Blockfrost API
-     -> Smart contract / validator on Cardano Preprod
-     -> Backend API (Express)
-        -> Lighthouse upload service
-        -> MariaDB database via Prisma
+NFT-MarketPlace/
+├── on-chain/
+│   ├── code/
+│   │   ├── Utilities/
+│   │   ├── nix/
+│   │   └── wspace/
+│   ├── README.md
+│   ├── NIX SETUP.md
+│   ├── flake.nix
+│   └── default.nix
+├── off-chain/
+│   ├── frontend/
+│   └── backend/
+└── README.md
 ```
 
-## Tech Stack
+## Signification des dossiers
 
-### Frontend
+### `on-chain`
 
-- React
-- Vite
-- React Router
-- Lucid Cardano
-- Blockfrost API
-- SweetAlert2
+Le dossier `on-chain` contient les éléments qui servent à définir la logique blockchain du projet.
 
-### Backend
+On y retrouve notamment :
 
-- Node.js
-- Express
-- TypeScript
-- Prisma ORM
-- MariaDB adapter
-- Multer
-- Lighthouse Web3 SDK
+- les scripts et smart contracts écrits en Haskell/Plutus
+- la logique de validation utilisée par la marketplace NFT
+- l'environnement de compilation et d'exécution Nix
+- les fichiers de test et de documentation liés à la partie blockchain
 
-## Repository Structure
+Autrement dit, `on-chain` correspond à ce qui va être utilisé sur la blockchain Cardano.
 
-```text
-.
-├── frontend/                    # React application
-│   ├── src/                     # Components, utilities, styles
-│   ├── services/                # External service helpers
-│   └── README.md                # Frontend documentation
-├── backend/                     # Express API and database layer
-│   ├── src/                     # Server, routes, Prisma config
-│   ├── uploads/                 # Temporary uploaded files
-│   └── README.md                # Backend documentation
-└── README.md                    # Project overview
-```
+#### Sous-structure importante de `on-chain`
 
-## How The Project Works
+- `on-chain/code/`
+  Contient le code source principal de la partie blockchain.
 
-### 1. Wallet connection
+- `on-chain/code/wspace/`
+  Espace de travail principal du projet Haskell.
 
-The frontend connects to a Cardano browser wallet such as Lace, Nami, or Eternl.
+- `on-chain/code/wspace/lecture/`
+  Contient les fichiers de la logique métier on-chain, notamment `NFTMarketPlace.hs` et `Main.hs`.
 
-Once connected, the app initializes Lucid on the `Preprod` network and can:
+- `on-chain/code/wspace/tests/`
+  Contient les tests de la partie on-chain.
 
-- read wallet UTxOs
-- derive the validator address
-- build and submit transactions
+- `on-chain/code/Utilities/`
+  Bibliothèque utilitaire utilisée par le projet Haskell.
 
-### 2. NFT minting
+- `on-chain/code/nix/`
+  Contient les fichiers liés à la gestion de l'environnement Nix.
 
-When a user mints an NFT:
+- `on-chain/flake.nix`, `on-chain/default.nix`, `on-chain/code/cabal.project`
+  Fichiers de configuration pour construire et exécuter le projet on-chain.
 
-- the frontend collects the NFT name, description, and media file
-- the file is sent to the backend
-- the backend uploads the file to Lighthouse and returns a CID
-- the frontend creates NFT metadata using that CID
-- the frontend submits the mint transaction on Cardano Preprod
-- the frontend sends the mint transaction hash to the backend for storage
+### `off-chain`
 
-### 3. NFT selling
+Le dossier `off-chain` regroupe tout ce qui est utilisé hors de la blockchain.
 
-When a user lists an NFT for sale:
+Il correspond à la partie applicative qui permet d'interagir avec les smart contracts, avec l'utilisateur et avec les services externes.
 
-- the frontend loads NFTs from the connected wallet
-- the user chooses a price in ADA
-- the frontend builds a transaction that locks the NFT at the marketplace validator
-- the listing becomes visible on the marketplace home page
+Autrement dit, `off-chain` contient tout ce qui n'est pas exécuté sur la blockchain elle-même.
 
-### 4. Buying, updating, and canceling listings
+#### Sous-structure importante de `off-chain`
 
-The home page reads NFTs currently held by the validator address.
+- `off-chain/frontend/`
+  Interface utilisateur de l'application. C'est la partie qui permet à l'utilisateur de connecter son wallet, consulter les NFTs et lancer des actions comme le mint, la vente, l'achat, la mise à jour ou l'annulation.
 
-From there, the frontend can:
+- `off-chain/backend/`
+  Serveur backend de l'application. Il prend en charge les services complémentaires hors blockchain comme la gestion d'API, l'upload de fichiers, la persistance de certaines données et la communication avec des services externes.
 
-- buy a listed NFT
-- update the sale price
-- cancel a listing
+## Lecture fonctionnelle du projet
 
-These actions are executed directly through Cardano transactions built in the frontend.
+Le projet peut donc se comprendre comme suit :
 
-### 5. Transaction persistence
+1. La partie `on-chain` définit les règles blockchain de la marketplace NFT.
+2. La partie `off-chain/frontend` fournit l'interface et prépare les interactions utilisateur.
+3. La partie `off-chain/backend` fournit les services techniques nécessaires en dehors de la blockchain.
 
-The backend stores transaction data in a MariaDB database through Prisma.
+Cette séparation permet de mieux comprendre les responsabilités :
 
-The current schema includes a `Transaction` table with:
+- `on-chain` = logique blockchain, validation, scripts
+- `off-chain` = interface, orchestration, API, stockage, intégrations
 
-- wallet address
-- timestamp
-- transaction hash
-- transaction type
+## Fichiers clés pour démarrer
 
-## Network and Services
+Si vous souhaitez comprendre rapidement le projet, les fichiers les plus utiles sont :
 
-This project currently targets:
+- `on-chain/code/wspace/lecture/NFTMarketPlace.hs`
+- `on-chain/code/wspace/lecture/Main.hs`
+- `on-chain/README.md`
+- `off-chain/frontend/README.md`
+- `off-chain/backend/README.md`
 
-- Cardano `Preprod`
-- Blockfrost for blockchain API access
-- Lighthouse for decentralized file storage
-- MariaDB for backend persistence
+## Résumé
 
-## Environment Variables
+La structuration du projet repose sur une idée simple :
 
-### Frontend
+- `on-chain` contient ce qui vit côté blockchain
+- `off-chain` contient ce qui vit en dehors de la blockchain
 
-Create `frontend/.env` with values such as:
-
-```env
-VITE_BLOCKFROST_PROJECT_ID=your_blockfrost_project_id
-VITE_LIGHTHOUSE_API_KEY=your_lighthouse_api_key
-VITE_BASE_URL=http://localhost:3000
-```
-
-### Backend
-
-Create `backend/.env` with values such as:
-
-```env
-FRONTEND_URL=http://localhost:5173
-VITE_LIGHTHOUSE_API_KEY=your_lighthouse_api_key
-DATABASE_HOST=localhost
-DATABASE_PORT=3306
-DATABASE_USER=your_db_user
-DATABASE_PASSWORD=your_db_password
-DATABASE_NAME=your_db_name
-DATABASE_URL=mysql://user:password@localhost:3306/database
-```
-
-## Getting Started
-
-### 1. Install frontend dependencies
-
-```bash
-cd frontend
-npm install
-```
-
-### 2. Install backend dependencies
-
-```bash
-cd ../backend
-npm install
-```
-
-### 3. Configure environment variables
-
-Create and fill:
-
-- `frontend/.env`
-- `backend/.env`
-
-### 4. Start the backend
-
-From `backend/`:
-
-```bash
-npm run dev
-```
-
-Backend default URL:
-
-```text
-http://localhost:3000
-```
-
-### 5. Start the frontend
-
-From `frontend/`:
-
-```bash
-npm run dev
-```
-
-Frontend default URL:
-
-```text
-http://localhost:5173
-```
-
-## Build Commands
-
-### Frontend
-
-```bash
-cd frontend
-npm run build
-```
-
-### Backend
-
-```bash
-cd backend
-npm run build
-```
-
-## Development Notes
-
-- The frontend contains the main smart-contract logic.
-- The backend is intentionally small and focused on uploads and transaction storage.
-- NFT media is displayed through an IPFS gateway when available.
-- A Cardano wallet extension is required for most marketplace actions.
-- The project is currently designed for test and development usage on `Preprod`, not production mainnet usage.
-
-## Documentation
-
-More detailed documentation is available here:
-
-- [frontend/README.md](/home/dakdak/code/nft-market-place-frontend/frontend/README.md)
-- [backend/README.md](/home/dakdak/code/nft-market-place-frontend/backend/README.md)
-
-## Current Scope
-
-This project demonstrates a full Cardano NFT marketplace workflow across:
-
-- wallet connection
-- NFT minting
-- decentralized media upload
-- smart-contract-based listing and purchasing
-- backend transaction persistence
-
-## Possible Future Improvements
-
-- add authentication and stronger access control
-- add validation and better API error handling
-- log more transaction types in the backend
-- improve loading states and UX feedback in the frontend
-- add automated tests for frontend and backend flows
-- prepare configuration for mainnet deployment if needed
+Cette organisation rend le projet plus lisible, plus maintenable et plus simple à faire évoluer.
