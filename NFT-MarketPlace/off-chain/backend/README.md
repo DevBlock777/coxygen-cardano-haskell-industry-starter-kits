@@ -258,10 +258,3 @@ This backend is intentionally small and focused. Its current role is to:
 - persist transaction metadata in MariaDB
 - provide a simple bridge between marketplace actions and stored backend records
 
-## Important Implementation Notes
-
-- The application currently listens on a fixed port: `3000`.
-- Uploaded files are first written to a local `uploads/` directory before being sent to Lighthouse.
-- No authentication or authorization layer is implemented yet.
-- No validation or error-handling middleware is currently in place, so invalid requests or external service failures may need additional safeguards in the future.
-
