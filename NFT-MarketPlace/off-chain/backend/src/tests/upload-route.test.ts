@@ -13,8 +13,9 @@ describe("Post /upload", () => {
     })
   });
 
-  it("successfully uploads a file and returns the cid", async () => {
-    
+  it(`successfully uploads a file to ipfs thanks to 
+    lighthouse and returns the cid`, async () => {
+
     const response = await request(app)
     .post("/upload")
     .attach( "file", path.join(__dirname,"file.txt") )
