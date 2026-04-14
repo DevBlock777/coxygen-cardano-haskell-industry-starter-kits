@@ -50,12 +50,11 @@ backend/
 
 ### 1. Server startup
 
-The server starts from `src/server.ts`.
+The server starts from `src/app.ts`.
 
 At startup it:
 
 - Loads environment variables.
-- Imports the Express app from `src/app.ts`.
 - Enables JSON body parsing.
 - Enables CORS for the frontend URL defined in the environment.
 - Mounts the main router.
@@ -265,11 +264,3 @@ This backend is intentionally small and focused. Its current role is to:
 - No authentication or authorization layer is implemented yet.
 - No validation or error-handling middleware is currently in place, so invalid requests or external service failures may need additional safeguards in the future.
 
-## Possible Future Improvements
-
-- Add request validation for `/upload` and `/tx`
-- Add centralized error handling
-- Make the server port configurable with an environment variable
-- Add logging and monitoring
-- Add authentication for protected actions
-- Clean up temporary uploaded files after successful Lighthouse upload
