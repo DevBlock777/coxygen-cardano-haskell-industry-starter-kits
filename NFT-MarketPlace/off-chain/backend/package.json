@@ -6,7 +6,7 @@
   "types": "types.d.ts",
   "scripts": {
     "test": "node --import=tsx ./node_modules/mocha/bin/mocha 'src/tests/*.test.ts'",
-    "dev": "node --import=tsx --watch src/app.ts",
+    "dev": "node --import=tsx --watch src/server.ts",
     "build": "tsc"
   },
   "keywords": [],
