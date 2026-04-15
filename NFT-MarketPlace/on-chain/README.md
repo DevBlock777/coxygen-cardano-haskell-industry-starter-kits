@@ -292,22 +292,19 @@ plutus-nix/
 
 ## 5. 🔍 Understanding the Contracts
 
-### 5.1 Basic Vesting
+### 5.1 NFTMarketPlace
 
-* **File**: `lecture/Vesting.hs`
+* **File**: `lecture/NFTMarketPlace.hs`
 * Validates that:
 
-  * A transaction is signed by the **beneficiary**
-  * The **deadline** has been reached
+  * Contains the logic for Minting, Buying, Selling and Cancelling a sell for a NFT
 
-### 5.2 Parameterized Vesting
+### 5.2 Main
 
-* **File**: `lecture/ParameterizedVesting.hs`
-* Accepts:
+* **File**: `lecture/Main.hs`
+* Takes:
 
-  * `beneficiary :: PubKeyHash`
-  * `deadline :: POSIXTime`
-* Uses `liftCode` to embed these at compile time
+  * the getCbor function from the NFTMarketPlace module and computes the cbor
 
 ---
 
@@ -329,36 +326,8 @@ plutus-nix/
 
 ---
 
-## 7. 🧪 Testing and Debugging
 
-### Test Entry
-
-```haskell
-main :: IO ()
-main = defaultMain tests
-```
-
-### Test Files
-
-```text
-test/
-├── CGPlutusUtilsSpec.hs
-├── CGTimeSpec.hs
-├── VestingSpec.hs
-├── ParameterizedVestingSpec.hs
-├── Spec.hs
-└── Main.hs
-```
-
-Run tests via:
-
-```bash
-cabal test all
-```
-
----
-
-## 8. 📖 Glossary of Terms
+## 7. 📖 Glossary of Terms
 
 | Term                     | Description                                         |
 | ------------------------ | --------------------------------------------------- |
