@@ -294,7 +294,6 @@ plutus-nix/
 ### 5.1 NFTMarketPlace
 
 * **File**: `lecture/NFTMarketPlace.hs`
-* Validates that:
 
   * Contains the logic for Minting, Buying, Selling and Cancelling a sell for a NFT
 
