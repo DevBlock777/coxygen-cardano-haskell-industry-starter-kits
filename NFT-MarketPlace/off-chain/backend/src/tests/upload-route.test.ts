@@ -18,9 +18,8 @@ describe("Post /upload", () => {
 
     const response = await request(app)
     .post("/upload")
-    .attach( "file", path.join(__dirname,"file.txt") )
+    .attach( "file", path.join(__dirname,"file.txt"))
     .expect(200)
-    expect (response.body).to.have.property("cid")
-       
+    expect (response.body).to.have.property("cid") 
   })
 });
