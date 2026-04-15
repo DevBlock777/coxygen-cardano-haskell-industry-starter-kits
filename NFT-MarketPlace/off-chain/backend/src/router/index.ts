@@ -3,10 +3,11 @@ import "dotenv/config"
 import lighthouse from '@lighthouse-web3/sdk'
 import multer from "multer"
 import { addTx } from "../config/functions.js";
+import { TransactionType } from "../generated/prisma/enums.js";
 const router = Router()
 
 const upload = multer({ dest: "uploads/" })
-const VITE_LIGHTHOUSE_API_KEY = process.env.VITE_LIGHTHOUSE_API_KEY!
+const LIGHTHOUSE_API_KEY = process.env.LIGHTHOUSE_API_KEY!
 
 router.post("/upload", upload.single('file'), async (req: Request, res: Response) => {
 
@@ -21,7 +22,7 @@ router.post("/upload", upload.single('file'), async (req: Request, res: Response
     // Third parameter is for multiple files, if multiple files are to be uploaded at once make it true
     // Fourth parameter is the deal parameters, default null
     const cidVersion = 0
-    const output = await lighthouse.upload(filePath, VITE_LIGHTHOUSE_API_KEY, cidVersion)
+    const output = await lighthouse.upload(filePath, LIGHTHOUSE_API_KEY, cidVersion)
     console.log('File Status:', output)
     /*
       output:
@@ -40,17 +41,29 @@ router.post("/upload", upload.single('file'), async (req: Request, res: Response
 })
 
 router.post("/tx",async (req: Request,res: Response)=>{
-      const {address ,txHash,txType} = req.body
-      console.log({address,txHash,txType});
+       try {
+    const { address, txHash, txType } = req.body;
 
-      if(!address || !txHash || !txType)
+    if (!address || !txHash || !txType) {
+      return res.status(400).json({
+        error: "address, txHash and txType are required",
+      });
+    }
+
+    if(!Object.values(TransactionType).includes(txType)){
         return res.status(400).json({
-      error : "address, txHash and txType are required"})
-      
-      const result = await addTx(address,txHash,txType)
-      res.status(200).json({
-        result
-      })
+            error: "Invalid transaction type"
+        })
+    }
+
+    const result = await addTx(address, txHash, txType);
+
+    res.status(200).json({ result });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal error" });
+  }
 })
 
 export default router
