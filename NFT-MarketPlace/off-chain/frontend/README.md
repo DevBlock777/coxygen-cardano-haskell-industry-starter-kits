@@ -26,7 +26,6 @@ The frontend is responsible for:
 - React Router
 - Lucid Cardano
 - Blockfrost API
-- Lighthouse
 - SweetAlert2
 - TypeScript support for tooling
 
@@ -38,8 +37,6 @@ frontend/
 ├── vite.config.ts                # Vite configuration
 ├── index.html                    # App entry HTML
 ├── public/                       # Static assets
-├── services/
-│   └── lightHouse.js             # Lighthouse upload helper
 └── src/
     ├── main.jsx                  # React entry point
     ├── App.jsx                   # Router configuration
@@ -49,7 +46,6 @@ frontend/
     │   ├── Mint.jsx              # NFT mint page
     │   ├── Sell.jsx              # Wallet NFT sell page
     │   ├── NavBar.jsx            # Main navigation + wallet connect
-    │   └── MintPDF.jsx           # Extra minting component not currently routed
     ├── utilities/
     │   ├── connectWallet.js      # Cardano wallet and contract logic
     │   ├── showTx.ts             # Success and error modal helpers
@@ -159,14 +155,12 @@ Create a `.env` file in the `frontend/` directory.
 Variables used by the frontend code:
 
 ```env
-VITE_LIGHTHOUSE_API_KEY=your_lighthouse_api_key
 VITE_BLOCKFROST_PROJECT_ID=your_blockfrost_project_id
 VITE_BASE_URL=http://localhost:3000
 ```
 
 ### Notes
 
-- `VITE_BLOCKFROST_PROJECT_ID` is required to query blockchain and asset data through Blockfrost.
 - `VITE_BASE_URL` is required by the mint flow to call the backend API.
 - `VITE_LIGHTHOUSE_API_KEY` exists in the project configuration and helper service, although the main mint flow currently uploads through the backend instead of using the frontend Lighthouse helper directly.
 
@@ -264,11 +258,3 @@ This frontend is the main interaction layer of the NFT marketplace. It:
 - submits marketplace smart-contract transactions
 - provides the full user interface for the marketplace workflow
 
-## Possible Future Improvements
-
-- add stronger form validation before submitting blockchain actions
-- add loading and error states consistently across every page
-- document wallet compatibility and setup in more detail
-- log additional transaction types to the backend, not only minting
-- add route protection or clearer wallet-required UI states
-- keep `.env.example` aligned with every environment variable actually required by the app
