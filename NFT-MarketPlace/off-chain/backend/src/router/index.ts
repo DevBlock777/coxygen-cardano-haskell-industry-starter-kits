@@ -11,7 +11,7 @@ const VITE_LIGHTHOUSE_API_KEY = process.env.VITE_LIGHTHOUSE_API_KEY!
 router.post("/upload", upload.single('file'), async (req: Request, res: Response) => {
 
     const filePath = req?.file?.path
-    console.log({filePath});
+    
     if(!filePath) return res.status(400).json({
       error : "File is required"
     })
@@ -42,6 +42,10 @@ router.post("/upload", upload.single('file'), async (req: Request, res: Response
 router.post("/tx",async (req: Request,res: Response)=>{
       const {address ,txHash,txType} = req.body
       console.log({address,txHash,txType});
+
+      if(!address || !txHash || !txType)
+        return res.status(400).json({
+      error : "address, txHash and txType are required"})
       
       const result = await addTx(address,txHash,txType)
       res.status(200).json({
