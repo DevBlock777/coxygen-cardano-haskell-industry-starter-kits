@@ -167,7 +167,8 @@ DATABASE_URL=mysql://user:password@localhost:3306/database
 ### Notes
 
 - `FRONTEND_URL` is used by CORS to allow frontend requests.
-- `VITE_LIGHTHOUSE_API_KEY` is used to authenticate uploads to Lighthouse.
+- `LIGHTHOUSE_API_KEY` is used to authenticate uploads to Lighthouse.
+   You can get yours here https://files.lighthouse.storage/dashboard/apikey
 - `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER`, `DATABASE_PASSWORD`, and `DATABASE_NAME` are used by the MariaDB Prisma adapter at runtime.
 - `DATABASE_URL` is used by Prisma configuration for migrations and Prisma tooling.
 
