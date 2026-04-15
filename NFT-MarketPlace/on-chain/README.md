@@ -278,7 +278,6 @@ plutus-nix/
 │   │   │   ├── Main.hs
 │   │   │   ├── NFTMarketPlace.hs
 │   │   ├── test/
-│   │   │   ├── Spec.hs
 │   │   ├── docs/
 │   │   ├── Tutorials.md
 │   │   ├── cabal.project
