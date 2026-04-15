@@ -275,17 +275,10 @@ plutus-nix/
 │   ├── wspace/
 │   │   ├── assets/
 │   │   ├── lecture/
-│   │   │   ├── CGPlutusUtilsv1.hs
-│   │   │   ├── CGTime.hs
-│   │   │   ├── ParameterizedVesting.hs
-│   │   │   └── Vesting.hs
+│   │   │   ├── Main.hs
+│   │   │   ├── NFTMarketPlace.hs
 │   │   ├── test/
-│   │   │   ├── CGPlutusUtilsSpec.hs
-│   │   │   ├── CGTimeSpec.hs
-│   │   │   ├── VestingSpec.hs
-│   │   │   ├── ParameterizedVestingSpec.hs
 │   │   │   ├── Spec.hs
-│   │   │   └── Main.hs
 │   │   ├── docs/
 │   │   ├── Tutorials.md
 │   │   ├── cabal.project
