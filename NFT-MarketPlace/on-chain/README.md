@@ -295,7 +295,7 @@ plutus-nix/
 
 * **File**: `lecture/NFTMarketPlace.hs`
 
-  * Contains the logic for Minting, Buying, Selling and Cancelling a sell for a NFT
+  * Contains the logic for minting, buying, selling, and canceling the sale of an NFT.
 
 ### 5.2 Main
 
