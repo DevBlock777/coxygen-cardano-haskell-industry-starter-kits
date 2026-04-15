@@ -78,6 +78,8 @@ export async function getWalletNft() {
                         image: (imageLink === 'ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
                             ? undefined : imageLink)
                     });
+                    // console.log({nfts});
+                    
             }
         }
     }

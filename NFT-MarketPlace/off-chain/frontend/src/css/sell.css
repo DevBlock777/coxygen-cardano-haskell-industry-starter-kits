@@ -155,10 +155,10 @@
 }
 
 .nft-actions input[type="number"] {
-  background: var(--surface-2);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  color: var(--text);
+  color: #311414;
   padding: 9px 12px;
   font-family: 'DM Mono', monospace;
   font-size: 14px;

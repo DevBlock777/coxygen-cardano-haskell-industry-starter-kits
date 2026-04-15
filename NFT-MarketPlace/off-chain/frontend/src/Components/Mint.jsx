@@ -3,7 +3,6 @@ import "../css/mint.css";
 import { mintNFT } from "../utilities/connectWallet";
 import { showTx } from "../utilities/showTx";
 import { useNavigate } from "react-router-dom";
-import { uploadFile } from "../../services/lightHouse";
 
 
 
