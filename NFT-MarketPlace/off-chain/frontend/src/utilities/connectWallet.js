@@ -34,9 +34,13 @@ export async function connectWallet() {
         console.log("User address:", walletAddress);
         const validatorAddress = lucid.utils.validatorToAddress(validator);
         console.log("Validator address:", validatorAddress);
+        console.log(walletAddress);
+
         return { walletAddress, lucid, validatorAddress };
     } catch (err) {
-        showErrorMsg("Wallet connection error");
+        console.log(err);
+        
+        showErrorMsg("Wallet connection error ", err);
         return null;
     }
 }
@@ -63,11 +67,17 @@ export async function getWalletNft() {
 
                 const data = await response.json();
                 // console.log({ data });
-                const imageLink = data.onchain_metadata.image
-                // console.log({ imageLink });
+                let imageLink;
+                if (data.onchain_metadata) {
+                    imageLink = data.onchain_metadata.image
+                    // console.log({ imageLink });
+
+
+                }
                 const policyId = unit.slice(0, 56);
                 const assetNameHex = unit.slice(56);
                 const assetName = hexToString(assetNameHex);
+
                 //betsoNft datum was bad formatted during selling, we exclude it
                 if (assetName !== "betsoNft")
                     nfts.push({
@@ -76,10 +86,11 @@ export async function getWalletNft() {
                         assetName,
                         utxo,
                         image: (imageLink === 'ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+                            || imageLink === undefined
                             ? undefined : imageLink)
                     });
-                    // console.log({nfts});
-                    
+                // console.log({nfts});
+
             }
         }
     }
@@ -127,7 +138,7 @@ export async function sellNft(price, nft) {
         const txHash = await signedTx.submit();
         console.log("Sell transaction submitted with hash:", txHash);
         return txHash
-        
+
     } catch (error) {
         showErrorMsg("Transaction error")
         console.error("Error building sell transaction:", error);
@@ -150,40 +161,43 @@ export async function mintNFT(assetName, CID, description) {
     const nftUnit = policyId + fromText(assetName);
     const value = { [nftUnit]: 1n };
     // console.log({ assetName });
+    let tx;
+    console.log({ CID });
 
-    const metadata = {
-        [policyId]: {
-            [assetName]: {
-                name: assetName,
-                image: `ipfs://${CID}`, // exemple d'image hébergée sur IPFS
-                description: `${description}`,
+    if (CID) {
+        const metadata = {
+            [policyId]: {
+                [assetName]: {
+                    name: assetName,
+                    image: `ipfs://${CID}`, // exemple d'image hébergée sur IPFS
+                    description: `${description}`,
+                }
             }
-        }
-    };
+        };
+        tx = await lucid
+            .newTx()
+            .mintAssets(value)         // mint your NFT
+            .attachMintingPolicy(mintingPolicy)
+            .attachMetadata(721, metadata) // Put the metadata on-chain 
+            .payToAddress(walletAddress, { lovelace: 2000000n })
+            .complete()
 
-    const tx = await lucid
-        .newTx()
-        .mintAssets(value)         // mint ton NFT
-        .attachMintingPolicy(mintingPolicy)
-        .attachMetadata(721, metadata)  // ajoute tes metadata
-        .payToAddress(walletAddress, { lovelace: 2000000n }) // envoie à toi-même ou à un wallet
-        .complete()
+    } else {
+        tx = await lucid
+            .newTx()
+            .mintAssets(value)         // mint your NFT
+            .attachMintingPolicy(mintingPolicy)
+            .payToAddress(walletAddress, { lovelace: 2000000n })
+            .complete()
+    }
 
     const signedTx = await tx.sign().complete();
     const txHash = await signedTx.submit();
     console.log("✅ Token minted!");
     console.log("Tx hash:", txHash);
     console.log("Policy ID:", policyId);
-    return {txHash,walletAddress}
+    return { txHash, walletAddress }
 }
-// const addLiquidityBtn = document.getElementById("addLiqBtn");
-
-// addLiquidityBtn.addEventListener("click", async () => {
-//   const address = await connectWallet();
-//   console.log(address);
-//   await mint();
-//   // addLiquidity(amountA, amountB, "", "", address);
-// });
 
 export function hexToString(hex) {
     let str = "";
@@ -245,17 +259,27 @@ export async function getValidatorNfts() {
                 );
                 const data = await response.json();
                 // console.log({ data });
-                const imageLink = data.onchain_metadata.image
-                console.log({data});
-                
+                let imageLink;
+                if (data.onchain_metadata) {
+                    imageLink = data.onchain_metadata.image
+                    // console.log({ imageLink });
+
+
+                }
+                const policyId = unit.slice(0, 56);
+                const assetNameHex = unit.slice(56);
+                const assetName = hexToString(assetNameHex);
+
+                //betsoNft datum was bad formatted during selling, we exclude it
+
+                console.log({ data });
+
                 // console.log({ imageLink });
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const policyId = unit.slice(0, 56);
-                const assetNameHex = unit.slice(56);
-                const assetName = hexToString(assetNameHex);
+
                 // console.log("datum is", utxo.datum)
                 // console.log("datum decoded is", Data.from(utxo.datum!));
                 //betsoNft datum was bad formatted during selling, we exclude it
@@ -277,11 +301,14 @@ export async function getValidatorNfts() {
                         policyId,
                         assetName,
                         utxo,
-                        result,
                         image: (imageLink === 'ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+                            || imageLink === undefined
                             ? undefined : imageLink)
                     });
+                // console.log({nfts});
+
             }
+
         }
     }
 

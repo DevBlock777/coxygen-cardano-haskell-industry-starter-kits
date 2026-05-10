@@ -19,9 +19,11 @@ export default function Mint() {
         const name = nftNameRef.current?.value;
         const description = nftDes.current?.value
         console.log("Minting NFT with name:", name);
-        const file = nftImageRef.current.files[0]
+        let hash, minterAddress;
         const BASE_URL = import.meta.env.VITE_BASE_URL
         console.log("Base urk",BASE_URL);
+        if(nftImageRef.current.files[0]){
+        const file = nftImageRef.current.files[0]
         
         let formData = new FormData()
         formData.append("file",file)
@@ -34,16 +36,22 @@ export default function Mint() {
         console.log("data",{data});
         
         // alert("File uploaded to IPFS with CID: " + cid);
-        // try {
          const {txHash,walletAddress} = await mintNFT(name, cid, description);
+         hash = txHash
+         minterAddress = walletAddress
+    } else {
+        const {txHash,walletAddress} = await mintNFT(name,  null, description);
+        hash = txHash
+        minterAddress = walletAddress
+    }
             res = await fetch(`${BASE_URL}/tx`,{
             method: "POST",
             headers: {
                "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                address: walletAddress,
-                txHash: txHash,
+                address: minterAddress,
+                txHash: hash,
                 txType: "MINT",
             })
          })
@@ -73,7 +81,7 @@ export default function Mint() {
                         maxLength={60} />
                 </label>
                 <label>
-                    NFT Image:
+                    NFT Image (Optional):
                     <input type="file" accept="application/pdf,image/*" ref={nftImageRef}
 
                         onChange={(e) => {
@@ -89,7 +97,7 @@ export default function Mint() {
                                 
                             }
                         }}
-                        required />
+                         />
                     {preview && (
   <div className="preview" style={{ marginTop: "10px" }}>
     {preview.type.startsWith("image/") && (
