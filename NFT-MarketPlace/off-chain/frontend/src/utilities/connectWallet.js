@@ -137,7 +137,7 @@ export async function sellNft(price, nft) {
         const signedTx = await tx.sign().complete();
         const txHash = await signedTx.submit();
         console.log("Sell transaction submitted with hash:", txHash);
-        return txHash
+        return {txHash,walletAddress}
 
     } catch (error) {
         showErrorMsg("Transaction error")

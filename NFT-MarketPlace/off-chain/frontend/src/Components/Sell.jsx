@@ -27,10 +27,27 @@ export default function Sell() {
             alert("Please enter a price before selling.");
             return;
         }
+        
         console.log("Selling NFT:", nft);
         console.log("Price:", price);
-        const txHash = await sellNft(price, nft);
-
+        const {txHash, walletAddress} = await sellNft(price, nft);
+        const BASE_URL = import.meta.env.VITE_BASE_URL
+        console.log({BASE_URL, txHash, walletAddress});
+        
+        const res = await fetch(`${BASE_URL}/tx`,{
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                address: walletAddress,
+                txHash: txHash,
+                txType: "SELL",
+            })
+         })
+        const data = await res.json()
+        const {result} = data
+        
         showTx(txHash);
         navigate("/")
         // Ici tu peux appeler buildSellTx(nft, price)
