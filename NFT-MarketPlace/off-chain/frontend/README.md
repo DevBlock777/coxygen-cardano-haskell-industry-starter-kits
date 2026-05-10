@@ -1,22 +1,27 @@
 # NFT Marketplace Frontend
 
-React/Vite frontend for the Cardano NFT marketplace. It lets users connect a wallet, mint NFTs, view wallet NFTs, list NFTs for sale, browse active listings, buy NFTs, update listing prices, and cancel sales.
+This frontend is the user-facing application of the Cardano NFT Marketplace. It lets users connect a Cardano wallet, mint NFTs, list owned NFTs for sale, browse active listings, buy listed NFTs, update listing prices, and cancel listings.
 
-The app targets the Cardano `Preprod` network and uses Lucid, Blockfrost, and the project backend.
+The application is built with React and Vite. It interacts with:
 
-## Features
+- Cardano Preprod through Lucid;
+- Blockfrost for asset and metadata lookup;
+- the backend API for file uploads and transaction persistence.
 
-- Connects a Cardano browser wallet: Lace, Nami, or Eternl.
-- Mints NFTs with a name and description.
-- Supports an optional image or PDF file during minting.
-- Uploads the file through the backend only when a file is selected.
-- Creates CIP-721 metadata with `image: ipfs://...` only when a CID is returned.
-- Displays NFTs from the connected wallet and NFTs locked at the marketplace smart contract.
-- Shows a deterministic emoji fallback when no IPFS image/file is available.
-- Supports sell, buy, price update, and cancel transactions through the smart contract.
-- Shows user feedback with SweetAlert2 and a Preprod explorer link.
+## What This Frontend Does
 
-## Stack
+The frontend is responsible for:
+
+- connecting a supported Cardano browser wallet;
+- minting NFT assets on Cardano Preprod;
+- uploading NFT media only when a file is selected during minting;
+- displaying wallet NFTs and marketplace listings;
+- using an emoji fallback when an NFT has no uploaded media;
+- submitting smart-contract transactions for sell, buy, update, and cancel actions;
+- sending submitted transaction hashes to the backend;
+- showing success and error feedback to users.
+
+## Tech Stack
 
 - React 19
 - Vite
@@ -24,9 +29,9 @@ The app targets the Cardano `Preprod` network and uses Lucid, Blockfrost, and th
 - Lucid Cardano
 - Blockfrost API
 - SweetAlert2
-- TypeScript for configuration and helper files
+- TypeScript support for tooling and helper files
 
-## Structure
+## Project Structure
 
 ```text
 frontend/
@@ -39,10 +44,10 @@ frontend/
     ├── App.jsx
     ├── index.css
     ├── Components/
-    │   ├── Home.jsx      # Active marketplace listings
-    │   ├── Mint.jsx      # Mint form
-    │   ├── Sell.jsx      # Wallet NFTs available to sell
-    │   └── NavBar.jsx    # Navigation and wallet connection
+    │   ├── Home.jsx
+    │   ├── Mint.jsx
+    │   ├── Sell.jsx
+    │   └── NavBar.jsx
     ├── utilities/
     │   ├── connectWallet.js
     │   ├── showTx.ts
@@ -50,114 +55,181 @@ frontend/
     └── css/
 ```
 
-## Routes
+## Frontend Routes
 
-Routes are defined in `src/App.jsx`:
+Routing is defined in `src/App.jsx`:
 
-- `/`: `Home`, active marketplace listings.
-- `/sell`: `Sell`, NFTs in the connected wallet.
-- `/mint`: `Mint`, NFT creation form.
+- `/` -> `Home`
+- `/sell` -> `Sell`
+- `/mint` -> `Mint`
 
-The navigation bar is rendered above all routes.
+A shared navigation bar is rendered above all page routes.
 
-## Wallet Connection
+## Application Flow
 
-Wallet logic lives in `src/utilities/connectWallet.js`.
+### 1. Wallet Connection
 
-When a wallet is connected, the app:
+Wallet connection logic lives in `src/utilities/connectWallet.js`.
 
-- initializes Lucid with Blockfrost on `Preprod`;
-- enables Lace, Nami, or Eternl depending on the available wallet;
-- reads the wallet address;
-- derives the marketplace validator address.
+The app supports these browser wallets when installed:
 
-The connected address is stored in `localStorage` so the app can try to reconnect after a page reload.
+- Lace
+- Nami
+- Eternl
 
-## Minting
+When a wallet is connected, the app initializes Lucid with Blockfrost on Cardano Preprod, selects the wallet API, reads the wallet address, and derives the marketplace validator address.
 
-Minting is implemented in `src/Components/Mint.jsx` and `mintNFT(...)` in `src/utilities/connectWallet.js`.
+The connected wallet address is stored in `localStorage` so the interface can attempt to reconnect after a reload.
 
-The file input is optional. The behavior is:
+### 2. Minting
 
-- if the user selects an image or PDF, the frontend sends the file to the backend with `POST /upload`;
-- the backend returns a `cid` for the file stored through Lighthouse/IPFS;
-- the frontend mints the NFT with CIP-721 metadata containing `name`, `description`, and `image: ipfs://<cid>`;
-- if no file is selected, the frontend does not call `POST /upload`;
-- in that case, Lighthouse is not used by the frontend and the NFT is minted without image metadata;
-- after minting, the frontend sends the transaction hash to the backend with `POST /tx` and `txType: "MINT"`.
+The minting page is implemented in `src/Components/Mint.jsx`.
 
-The file input accepts:
+The user provides:
 
-- images with `image/*`;
-- PDFs with `application/pdf`.
+- NFT name;
+- NFT description;
+- optional image or PDF file.
 
-When a file is selected, `Mint.jsx` shows a preview: an image preview for images, and an iframe preview for PDFs.
+The file is optional. If a file is selected, the frontend uploads it through the backend before minting. The backend returns a CID, and the NFT is minted with CIP-721 metadata containing the IPFS media reference.
 
-## NFT Display
+If no file is selected:
 
-NFTs are read from Blockfrost in `getWalletNft()` and `getValidatorNfts()`.
+- the frontend does not call the upload route;
+- Lighthouse/IPFS is not used for that mint;
+- the NFT is minted without image metadata;
+- the UI later displays an emoji placeholder instead of media.
 
-When an NFT has an `ipfs://...` image in its metadata, the UI replaces the IPFS prefix with the Lighthouse gateway:
+After minting, the frontend records the submitted transaction through the backend transaction route with transaction type `MINT`.
+
+### 3. Selling
+
+The sell page is implemented in `src/Components/Sell.jsx`.
+
+It loads NFTs from the connected wallet, displays each NFT with either its media or emoji fallback, lets the user enter a price in ADA, and submits a transaction that locks the NFT at the marketplace validator.
+
+After the sell transaction is submitted, the frontend records it through the backend transaction route with transaction type `SELL`.
+
+### 4. Marketplace Listings
+
+The home page is implemented in `src/Components/Home.jsx`.
+
+It loads NFTs currently locked at the marketplace validator and displays active listings. From this page, users can:
+
+- buy a listed NFT;
+- update a listing price;
+- cancel a listing.
+
+After each action, the frontend refreshes the listings and records the transaction through the backend transaction route with the matching transaction type.
+
+## NFT Media Display
+
+NFT media is read from on-chain metadata fetched through Blockfrost.
+
+If an NFT has an `ipfs://` image link, the app displays it through the Lighthouse gateway:
 
 ```text
 https://gateway.lighthouse.storage/ipfs/
 ```
 
-If no usable image link exists, the UI displays an emoji instead. The emoji is generated deterministically by `getNftEmoji(nft)` from the NFT identifier, so the same NFT keeps the same placeholder in both `Home` and `Sell`.
+If no usable media exists, the app displays a deterministic emoji generated from the NFT identifier. This keeps the same NFT visually consistent across the `Home` and `Sell` pages.
 
-This fallback matters for NFTs minted without a file: since no Lighthouse upload was performed, there is no IPFS image to display.
+This behavior is important for NFTs minted without a file: since no file was uploaded, there is no Lighthouse/IPFS image to display.
 
-## Selling And Marketplace
+## Backend Routes Used By The Frontend
 
-The `Sell` page loads wallet NFTs with `getWalletNft()`. For each NFT, the user enters a price in ADA, then `sellNft(...)` locks the NFT at the marketplace contract with an inline datum containing:
-
-- the price in lovelace;
-- the policy id;
-- the asset name;
-- the seller public key hash.
-
-The `Home` page loads NFTs held at the validator address with `getValidatorNfts()`. It supports:
-
-- buying an NFT with `buyNft(...)`;
-- updating the listing price with `updateNft(...)`;
-- cancelling a sale with `cancelNft(...)`.
-
-## Backend
-
-The frontend uses the URL defined by `VITE_BASE_URL`.
-
-Called endpoints:
+The frontend calls the backend using the base URL from `VITE_BASE_URL`.
 
 ### `POST /upload`
 
-Called only during minting when the user selected a file. The backend handles the Lighthouse/IPFS upload and returns a `cid`.
+Used only by the mint flow when the user selected a file.
+
+Purpose:
+
+- receives the selected image or PDF from the frontend;
+- uploads the file through the backend storage flow;
+- returns a CID used by the frontend as the NFT media reference.
+
+Used by:
+
+- `Mint` page
+
+Called when:
+
+- the user mints an NFT with a file.
+
+Not called when:
+
+- the user mints an NFT without a file.
+
+Expected result:
+
+- a CID that can be used as `ipfs://<cid>` in NFT metadata.
 
 ### `POST /tx`
 
-Called after minting to store the transaction in the backend database:
+Used after each submitted blockchain transaction.
+
+Purpose:
+
+- persists the wallet address;
+- persists the submitted transaction hash;
+- stores the transaction type for backend history/tracking.
+
+Used by:
+
+- `Mint` page after minting;
+- `Sell` page after listing an NFT;
+- `Home` page after buy, update, and cancel actions.
+
+Payload shape:
 
 ```json
 {
   "address": "wallet_address",
   "txHash": "transaction_hash",
-  "txType": "MINT"
+  "txType": "TRANSACTION_TYPE"
 }
 ```
 
-Sell, buy, update, and cancel transactions are currently handled on-chain by the frontend and are not sent to `/tx`.
+Transaction types sent by the frontend:
+
+- `MINT`: after a successful mint transaction.
+- `SELL`: after a successful listing transaction.
+- `BUY`: after a successful purchase transaction.
+- `UPDATE`: after a successful listing price update.
+- `CANCEL`: after a successful listing cancellation.
+
+## Smart Contract Integration
+
+The frontend contains the validator script reference in `src/utilities/validator.js` and the Cardano transaction logic in `src/utilities/connectWallet.js`.
+
+Main blockchain actions handled by the frontend:
+
+- minting NFTs;
+- reading NFTs from the connected wallet;
+- reading listed NFTs from the validator address;
+- locking NFTs at the marketplace contract for sale;
+- buying listed NFTs;
+- updating listing prices;
+- cancelling listings.
+
+The marketplace listing datum stores the sale price, policy id, asset name, and seller identity. The home page reads this datum to display listing prices and execute marketplace actions.
 
 ## Environment Variables
 
-Create a `.env` file in `frontend/`:
+Create a `.env` file in the `frontend/` directory.
+
+Variables used by the frontend:
 
 ```env
 VITE_BLOCKFROST_PROJECT_ID=your_blockfrost_project_id
 VITE_BASE_URL=http://localhost:3000
 ```
 
-`VITE_BLOCKFROST_PROJECT_ID` is used to read assets and interact with Cardano Preprod through Blockfrost.
+`VITE_BLOCKFROST_PROJECT_ID` is required for Cardano Preprod access through Blockfrost.
 
-`VITE_BASE_URL` is used to call the backend during minting.
+`VITE_BASE_URL` is required for backend calls to `/upload` and `/tx`.
 
 ## Installation
 
@@ -169,11 +241,13 @@ npm install
 
 ## Development
 
+Start the Vite development server:
+
 ```bash
 npm run dev
 ```
 
-By default, Vite serves the app at:
+The app is usually available at:
 
 ```text
 http://localhost:5173
@@ -181,16 +255,29 @@ http://localhost:5173
 
 ## Build And Verification
 
+Create a production build:
+
 ```bash
 npm run build
+```
+
+Preview the production build locally:
+
+```bash
 npm run preview
+```
+
+Run the linter:
+
+```bash
 npm run lint
 ```
 
 ## Important Notes
 
-- The application is configured for Cardano `Preprod`, not mainnet.
-- A Cardano browser wallet is required for blockchain actions.
-- The backend must be running to mint with a file and to store mint transactions.
-- Lighthouse/IPFS is used only when a file is added during minting.
-- Without an uploaded file, the UI displays an emoji instead of an image.
+- The application is configured for Cardano Preprod, not mainnet.
+- A supported Cardano browser wallet is required for blockchain actions.
+- The backend must be running for file uploads and transaction persistence.
+- Lighthouse/IPFS is used only when a file is selected during minting.
+- NFTs minted without an uploaded file are represented with an emoji fallback in the UI.
+- Transaction success modals link to the submitted transaction on Preprod CExplorer.
