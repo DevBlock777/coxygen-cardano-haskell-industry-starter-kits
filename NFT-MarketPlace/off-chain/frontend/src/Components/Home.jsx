@@ -25,16 +25,49 @@ function Home() {
             alert("This NFT is not for sale.");
             return;
         }
-        const txHash = await buyNft(price, nft);
+        const {txHash, walletAddress} = await buyNft(price, nft);
+         const BASE_URL = import.meta.env.VITE_BASE_URL
+        console.log({BASE_URL, txHash, walletAddress});
+        const res = await fetch(`${BASE_URL}/tx`,{
+                    method: "POST",
+                    headers: {
+                       "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        address: walletAddress,
+                        txHash: txHash,
+                        txType: "BUY",
+                    })
+                 })
+                const data = await res.json()
+                const {result} = data
+                console.log({data} , " updata");
         const updatedNfts = await getValidatorNfts();
         setNfts(updatedNfts);
         showTx(txHash);
     }
 
     async function handleCancel(nft) {
-        const txHash = await cancelNft(nft);
+        const {txHash, walletAddress} = await cancelNft(nft);
         const updatedNfts = await getValidatorNfts();
+           const BASE_URL = import.meta.env.VITE_BASE_URL
+        console.log({BASE_URL, txHash, walletAddress});
+        const res = await fetch(`${BASE_URL}/tx`,{
+                    method: "POST",
+                    headers: {
+                       "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        address: walletAddress,
+                        txHash: txHash,
+                        txType: "CANCEL",
+                    })
+                 })
+                const data = await res.json()
+                const {result} = data
+                console.log({data} , " updata");
         setNfts(updatedNfts);
+
         if (txHash !== undefined) showTx(txHash);
     }
 
@@ -43,11 +76,29 @@ function Home() {
             alert("Please enter a valid price");
             return;
         }
-        const txHash = await updateNft(parseInt(newPrice), nft);
+        const {txHash,walletAddress} = await updateNft(parseInt(newPrice), nft);
         setEditingNft(null);
         setNewPrice("");
         const updatedNfts = await getValidatorNfts();
         setNfts(updatedNfts);
+        const BASE_URL = import.meta.env.VITE_BASE_URL
+        console.log({BASE_URL, txHash, walletAddress});
+        const res = await fetch(`${BASE_URL}/tx`,{
+                    method: "POST",
+                    headers: {
+                       "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        address: walletAddress,
+                        txHash: txHash,
+                        txType: "UPDATE",
+                    })
+                 })
+                const data = await res.json()
+                const {result} = data
+                console.log({data} , " updata");
+                
+            
         if (txHash !== undefined) showTx(txHash);
     }
 

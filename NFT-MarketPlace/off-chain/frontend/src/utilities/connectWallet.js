@@ -371,8 +371,8 @@ export async function buyNft(price, nft) {
         const signedTx = await tx.sign().complete();
         const txHash = await signedTx.submit();
         console.log("Buy transaction submitted with hash:", txHash);
-        return txHash
-        return txHash;
+       
+        return {txHash, walletAddress};
     } catch (error) {
         showErrorMsg("Transaction error")
         console.error("Error building buy transaction:", error);
@@ -411,7 +411,7 @@ export async function cancelNft(nft) {
         const signedTx = await tx.sign().complete();
         const txHash = await signedTx.submit();
         // console.log("Buy transaction submitted with hash:", txHash);
-        return txHash;
+        return {txHash, walletAddress};
     } catch (error) {
         showErrorMsg("You're not the seller, cannot cancel")
         console.error("Error building buy transaction:", error);
@@ -464,7 +464,7 @@ export async function updateNft(newPrice, nft) {
         const signedTx = await tx.sign().complete();
         const txHash = await signedTx.submit();
         console.log("Buy transaction submitted with hash:", txHash);
-        return txHash;
+        return {txHash, walletAddress};
     } catch (error) {
         showErrorMsg("You're not the seller, cannot update")
         console.error("Error building buy transaction:", error);
